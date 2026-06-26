@@ -18,8 +18,6 @@ modelo = ChatGroq(
     temperature=0
 )
 
-print("Conexión con el modelo creada correctamente")
-
 # Función para leer el contenido del PDF y devolverlo como texto
 def leer_documento(ruta_pdf):
     try:
@@ -38,7 +36,36 @@ def limpiar_pregunta(texto):
     texto_limpio = " ".join(texto.lower().split())
     return texto_limpio
 
+# Función que recibe una pregunta y responde usando el documento como contexto
+def preguntar_al_agente(pregunta, contexto):
+    instruccion_sistema = f"""Eres el asistente virtual de Joseph's Innovations, una tienda
+    en línea que vende laptops, accesorios y artículos de tecnología en Costa Rica.
+
+    Reglas que debes seguir siempre:
+    1. Respondé únicamente con la información que aparece en el documento de abajo.
+    2. Nunca menciones que existe un documento, una base de datos o un archivo. Simplemente
+    da la respuesta como si la supieras de memoria, como parte de tu trabajo en la tienda.
+    3. Si la persona te saluda (hola, buenas, cómo estás, etc.), respondé el saludo de forma
+    breve y cordial, y preguntale cuál es su consulta.
+    4. Si la pregunta no tiene relación con Joseph's Innovations ni con la información
+    disponible, respondé de forma cordial que solo podés responder preguntas relacionadas
+    con la empresa Joseph's Innovations.
+    5. Después de dar una respuesta sobre la empresa, preguntá amablemente si hay algo más
+    en lo que puedas ayudar.
+
+    Información de la empresa:
+    {contexto}"""
+
+    mensajes = [
+        {"role": "system", "content": instruccion_sistema},
+        {"role": "user", "content": pregunta}
+    ]
+
+    respuesta = modelo.invoke(mensajes)
+    return respuesta.content
+
 # Prueba de la función
-ruta_documento = "documentos/PoliticasJosephsInnovations.pdf"
-contenido_documento = leer_documento(ruta_documento)
-print(limpiar_pregunta("   HOLA   Como ESTAS  "))
+ruta_documento = "documentos/PoliticasJosephsInnovations.pdf"           # Ruta del documento PDF que contiene la información de la empresa
+contenido_documento = leer_documento(ruta_documento)                    # Se llama la función leer_documento para obtener el contenido del PDF y se guarda en la variable contenido_documento
+respuesta_prueba = preguntar_al_agente("¿qué garantía tienen las laptops?", contenido_documento)
+print(respuesta_prueba)
