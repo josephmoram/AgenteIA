@@ -64,8 +64,23 @@ def preguntar_al_agente(pregunta, contexto):
     respuesta = modelo.invoke(mensajes)
     return respuesta.content
 
-# Prueba de la función
-ruta_documento = "documentos/PoliticasJosephsInnovations.pdf"           # Ruta del documento PDF que contiene la información de la empresa
-contenido_documento = leer_documento(ruta_documento)                    # Se llama la función leer_documento para obtener el contenido del PDF y se guarda en la variable contenido_documento
-respuesta_prueba = preguntar_al_agente("¿qué garantía tienen las laptops?", contenido_documento)
-print(respuesta_prueba)
+# Agente IA que responde preguntas sobre las políticas, devoluciones, garantías y productos de la tienda Joseph's Innovations
+if __name__ == "__main__":
+    ruta_documento = "documentos/PoliticasJosephsInnovations.pdf"               # Ruta del documento PDF que contiene la información de la empresa
+    contenido_documento = leer_documento(ruta_documento)                        # Se llama la función leer_documento para obtener el contenido del PDF y se guarda en la variable contenido_documento
+
+    # Ciclo que solicita al usuario una pregunta hasta que se ingrese una pregunta válida (no vacía)
+    pregunta_limpia = ""
+    while pregunta_limpia == "":
+        pregunta = input("Escribe una pregunta sobre las políticas, devoluciones, garantías o productos de la tienda Joseph's Innovations: ")
+        pregunta_limpia = limpiar_pregunta(pregunta)
+        if pregunta_limpia == "":
+            print("Pregunta vacía. Escribe algo para consultar.")
+
+    try:
+        respuesta = preguntar_al_agente(pregunta_limpia, contenido_documento)
+        print(f"Pregunta: {pregunta}")
+        print(f"Respuesta: {respuesta}")
+    except Exception as error:
+        print("Ocurrió un error al consultar al agente.")
+        print("El error fue:", error)
